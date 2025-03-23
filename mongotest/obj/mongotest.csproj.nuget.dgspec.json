@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Alvin\\Documents\\Uni\\4 semester\\PRJ4\\mongotest\\mongotest\\mongotest.csproj": {}
+    "D:\\c#\\BAD\\mongotest\\mongotest\\mongotest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Alvin\\Documents\\Uni\\4 semester\\PRJ4\\mongotest\\mongotest\\mongotest.csproj": {
+    "D:\\c#\\BAD\\mongotest\\mongotest\\mongotest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Alvin\\Documents\\Uni\\4 semester\\PRJ4\\mongotest\\mongotest\\mongotest.csproj",
+        "projectUniqueName": "D:\\c#\\BAD\\mongotest\\mongotest\\mongotest.csproj",
         "projectName": "mongotest",
-        "projectPath": "C:\\Users\\Alvin\\Documents\\Uni\\4 semester\\PRJ4\\mongotest\\mongotest\\mongotest.csproj",
-        "packagesPath": "C:\\Users\\Alvin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Alvin\\Documents\\Uni\\4 semester\\PRJ4\\mongotest\\mongotest\\obj\\",
+        "projectPath": "D:\\c#\\BAD\\mongotest\\mongotest\\mongotest.csproj",
+        "packagesPath": "C:\\Users\\TheFa\\.nuget\\packages\\",
+        "outputPath": "D:\\c#\\BAD\\mongotest\\mongotest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Alvin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TheFa\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

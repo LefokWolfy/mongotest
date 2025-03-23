@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using MongoAPI.Services;
+using mongoAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<MongoDBService>();    
+builder.Services.AddSingleton<UserService>();    
 
 // Add services to the container
 builder.Services.AddControllers();
