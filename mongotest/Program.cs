@@ -4,9 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using mongoAPI.Services;
+using mongotest.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<UserService>();    
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<CommentService>();
+builder.Services.AddSingleton<PostService>();
+
 
 // Add services to the container
 builder.Services.AddControllers();

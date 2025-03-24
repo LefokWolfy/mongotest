@@ -17,19 +17,19 @@ namespace mongoAPI.Services
             _usersCollection = database.GetCollection<User>("Users"); // Collection name
         }
 
-        public async Task AddCustomerAsync(User user) =>
+        public async Task AddUserAsync(User user) =>
             await _usersCollection.InsertOneAsync(user);
 
-        public async Task<IEnumerable<User>> GetCustomersAsync() =>
+        public async Task<IEnumerable<User>> GetUserAsync() =>
             await _usersCollection.Find(user => true).ToListAsync();
 
-        public async Task<User> GetCustomerAsync(ObjectId id) =>
+        public async Task<User> GetUserAsync(string id) =>
             await _usersCollection.Find<User>(user => user.UserId == id).FirstOrDefaultAsync();
 
-        public async Task UpdateCustomerAsync(ObjectId id, User user) =>
+        public async Task UpdateUserAsync(string id, User user) =>
             await _usersCollection.ReplaceOneAsync(user => user.UserId == id, user);
 
-        public async Task RemoveCustomerAsync(ObjectId id) =>
+        public async Task RemoveUserAsync(string id) =>
             await _usersCollection.DeleteOneAsync(user => user.UserId == id);
     }
 }

@@ -22,12 +22,12 @@ namespace mongotest.Controllers
                 Password = userDTO.Password
             };
 
-            await _userService.AddCustomerAsync(user);
+            await _userService.AddUserAsync(user);
             return CreatedAtAction(nameof(CreateUser), new { id = user.UserId }, user);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUsers() =>
-            Ok(await _userService.GetCustomersAsync());
+            Ok(await _userService.GetUserAsync());
     }
 }

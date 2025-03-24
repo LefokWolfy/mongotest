@@ -6,13 +6,33 @@ namespace mongoAPI.Models
     public class Comment
     {
         [BsonId]
-        public ObjectId CommentId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string CommentId { get; set; }
         public string CommentText { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? PostId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? ParentId { get; set; } // Parent comment
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; }
         public List<Comment>? Replies { get; set; }
     }
 
     public class CommentDTO
     {
         public string CommentText { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? PostId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? ParentId { get; set; }
+
     }
 }
