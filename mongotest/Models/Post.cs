@@ -16,7 +16,7 @@ namespace mongoAPI.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
 
-        public List<Comment>? Comments { get; set; }
+        public List<string>? CommentIds { get; set; } = new List<string>();
     }
 
     public class PostDTO

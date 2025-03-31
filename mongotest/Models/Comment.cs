@@ -18,7 +18,7 @@ namespace mongoAPI.Models
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
-        public List<Comment>? Replies { get; set; }
+        public List<string>? ReplyIds { get; set; } = new List<string>();
     }
 
     public class CommentDTO
