@@ -1,13 +1,14 @@
 using mongoAPI.Models;
-using mongoAPI.Services; // Adjust this namespace if needed.
+using mongoAPI.Services; // Adjust namespace if needed.
+using System.Threading.Tasks;
 
 namespace mongotest
 {
     public static class SeedData
     {
-        public static async Task InitializeAsync(UserService userService, PostService postService)
+        public static async Task InitializeAsync(UserService userService, PostService postService, ElasticSearchService elasticSearchService)
         {
-            // Create sample users matching your User model.
+            // Create sample users
             var users = new List<User>
             {
                 new User { Name = "Alice", Password = "password1" },
@@ -15,30 +16,28 @@ namespace mongotest
                 new User { Name = "Carol", Password = "password3" }
             };
 
-            // Insert users into the MongoDB database.
             foreach (var user in users)
             {
                 await userService.AddUserAsync(user);
             }
 
-            // Create at least 10 posts, cycling through the available users.
+            // Create and insert posts, indexing each one in Elasticsearch.
             var posts = new List<Post>();
             for (int i = 1; i <= 10; i++)
             {
-                // Cycle through the users for assignment.
                 var assignedUser = users[(i - 1) % users.Count];
                 posts.Add(new Post
                 {
                     Title = $"Test Post {i}",
                     Text = $"This is the content for test post {i}.",
-                    UserId = assignedUser.UserId // Assign the ID from the inserted user.
+                    UserId = assignedUser.UserId
                 });
             }
 
-            // Insert posts into the MongoDB database.
             foreach (var post in posts)
             {
                 await postService.AddPostAsync(post);
+                await elasticSearchService.IndexPostAsync(post);
             }
         }
     }

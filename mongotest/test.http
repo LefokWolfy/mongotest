@@ -1,0 +1,26 @@
+GET https://localhost:9200/posts/_search?pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+
+###
+
+PUT https://localhost:9200/posts?pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+Content-Type: application/json
+
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "Title": { "type": "text" },
+      "Text": { "type": "text" },
+      "UserId": { "type": "keyword" }
+    }
+  }
+}
+
+###
+
+POST http://localhost:5042/api/SeedData

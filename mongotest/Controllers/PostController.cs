@@ -28,6 +28,7 @@ namespace mongotest.Controllers
                 UserId = postDTO.UserId
             };
             await _postService.AddPostAsync(post);
+            await _elasticSearchService.IndexPostAsync(post); // Index the post
             return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, post);
         }
 

@@ -13,7 +13,6 @@ builder.Services.AddSingleton<CommentService>();
 builder.Services.AddSingleton<PostService>();
 builder.Services.AddSingleton<ElasticSearchService>();
 
-
 // Add services to the container
 builder.Services.AddControllers();
 
@@ -26,26 +25,21 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed default data
-using (var scope = app.Services.CreateScope())
+// Optionally enable HTTPS redirection based on configuration
+bool useHttpsRedirect = builder.Configuration.GetValue<bool>("UseHttpsRedirect");
+if (useHttpsRedirect)
 {
-    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
-    var postService = scope.ServiceProvider.GetRequiredService<PostService>();
-
-    await SeedData.InitializeAsync(userService, postService);
+    app.UseHttpsRedirection();
 }
 
 // Enable Swagger UI
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MongoAPI v1");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MongoAPI v1");
+});
 
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
