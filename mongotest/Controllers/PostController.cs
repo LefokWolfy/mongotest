@@ -27,8 +27,19 @@ namespace mongotest.Controllers
                 Text = postDTO.Text,
                 UserId = postDTO.UserId
             };
+
+            // Optionally pre-assign an ID if needed:
+            if (string.IsNullOrEmpty(post.PostId))
+            {
+                post.PostId = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+            }
+
             await _postService.AddPostAsync(post);
-            await _elasticSearchService.IndexPostAsync(post); // Index the post
+            Console.WriteLine($"[DEBUG] Post inserted with ID: {post.PostId}");
+            
+            await _elasticSearchService.IndexPostAsync(post);
+            Console.WriteLine($"[DEBUG] Post indexed in ES: {post.PostId}");
+
             return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, post);
         }
 

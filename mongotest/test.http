@@ -1,26 +1,53 @@
+// List all indices to confirm "posts" exists
+GET https://localhost:9200/_cat/indices?v&pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+
+###
+
+// Get the mapping for the "posts" index to ensure fields are as expected
+GET https://localhost:9200/posts/_mapping?pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+
+###
+
+// Get the count of documents in the "posts" index
+GET https://localhost:9200/posts/_count?pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+
+###
+
+// Get all documents in the "posts" index
 GET https://localhost:9200/posts/_search?pretty
 Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
 
 ###
 
-PUT https://localhost:9200/posts?pretty
+// Search for posts containing the word "Test"
+// (This assumes your seeded posts have "Test" in Title and/or Text)
+GET https://localhost:9200/posts/_search?pretty&q=Title:Test
 Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
-Content-Type: application/json
-
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "properties": {
-      "Title": { "type": "text" },
-      "Text": { "type": "text" },
-      "UserId": { "type": "keyword" }
-    }
-  }
-}
 
 ###
 
+// Delete the "posts" index (this cleans our Elasticsearch index)
+DELETE https://localhost:9200/posts?pretty
+Authorization: Basic ZWxhc3RpYzpjaGFuZ2VtZQ==
+
+###
+
+// Trigger automated seeding of your MongoDB posts.
+// Note that this endpoint is served by your ASP.NET Core application.
+// Replace {port} with your actual app port (e.g., http://localhost:5042).
+
 POST http://localhost:5042/api/SeedData
+Content-Type: application/json
+
+{}
+
+###
+// Trigger reindexing of your MongoDB posts into Elasticsearch.
+// This endpoint should fetch posts from MongoDB and index them in Elasticsearch.
+POST http://localhost:5042/api/SeedData/reindex
+Content-Type: application/json
+
+{}

@@ -24,7 +24,16 @@ namespace mongoAPI.Services
         public async Task AddPostAsync(Post post)
         {
             await _postsCollection.InsertOneAsync(post);
-            await _usersCollection.UpdateOneAsync(user => user.UserId == post.UserId, Builders<User>.Update.Push(user => user.PostIds, post.PostId));
+            Console.WriteLine($"[DEBUG] Inserted post with ID: {post.PostId}");
+
+            var updateResult = await _usersCollection.UpdateOneAsync(
+                user => user.UserId == post.UserId,
+                Builders<User>.Update.Push(user => user.PostIds, post.PostId));
+
+            if(updateResult.ModifiedCount == 0)
+            {
+                Console.WriteLine($"[DEBUG] User update did not modify any document for UserId: {post.UserId}");
+            }
         }
 
 

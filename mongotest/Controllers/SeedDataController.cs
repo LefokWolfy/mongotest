@@ -25,5 +25,21 @@ namespace mongotest.Controllers
             await SeedData.InitializeAsync(_userService, _postService, _elasticSearchService);
             return Ok("Seed complete");
         }
+
+        [HttpPost("reindex")]
+        public async Task<IActionResult> ReindexAll()
+        {
+            var allPosts = await _postService.GetPostsAsync();
+            foreach (var post in allPosts)
+            {
+                var indexResponse = await _elasticSearchService.IndexPostAsync(post);
+                if (!indexResponse.IsValid)
+                {
+                    return StatusCode(500, $"Failed to reindex post {post.PostId}: {indexResponse.DebugInformation}");
+                }
+            }
+            return Ok("Reindex complete");
+        }
+
     }
 }

@@ -2,6 +2,8 @@
 using Nest;
 using mongoAPI.Models;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 
 namespace mongoAPI.Services
 {
@@ -11,43 +13,36 @@ namespace mongoAPI.Services
 
         public ElasticSearchService(IConfiguration config)
         {
-            // Get Elasticsearch URI from appsettings.json
             var elasticUri = config["Elasticsearch:Uri"];
+
+            // Optionally, also move credentials to your appsettings.json
+            var username = config["Elasticsearch:Username"];
+            var password = config["Elasticsearch:Password"];
+            
             var settings = new ConnectionSettings(new Uri(elasticUri))
-                .DefaultIndex("posts");
+                .DefaultIndex("posts")
+                .BasicAuthentication(username, password)
+                .ServerCertificateValidationCallback((o, cert, chain, errors) => true); // Bypass certificate validation (for dev only)
+
             _client = new ElasticClient(settings);
         }
 
-        public async Task IndexPostAsync(Post post)
+        public async Task<IndexResponse> IndexPostAsync(Post post)
         {
             var response = await _client.IndexDocumentAsync(post);
-            // Force an index refresh to make the document searchable immediately.
             await _client.Indices.RefreshAsync("posts");
+            return response;
         }
-
+        
         public async Task<ISearchResponse<Post>> SearchPostsAsync(string query)
         {
-            // New approach: using QueryString targeting both Title and Text fields.
-            // var response = await _client.SearchAsync<Post>(s => s
-            //     .Query(q => q.QueryString(qs => qs
-            //         .Fields(f => f.Field(p => p.Title).Field(p => p.Text))
-            //         .Query(query)
-            //     ))
-            // );
-
-            // Alternatively, you could use a MultiMatch query:
-            
             var response = await _client.SearchAsync<Post>(s => s
                 .Query(q => q.MultiMatch(mm => mm
-                    .Fields(f => f
-                        .Field(p => p.Title)
-                        .Field(p => p.Text))
+                    .Fields(f => f.Field(p => p.Title).Field(p => p.Text))
                     .Query(query)
                     .Fuzziness(Fuzziness.Auto)
                 ))
             );
-            
-
             return response;
         }
     }
