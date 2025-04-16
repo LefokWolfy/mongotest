@@ -10,7 +10,13 @@ namespace mongotest.Controllers
     public class PostController : ControllerBase
     {
         private readonly PostService _postService;
-        public PostController(PostService postService) => _postService = postService;
+        private readonly ElasticSearchService _elasticSearchService;
+
+        public PostController(PostService postService, ElasticSearchService elasticSearchService)
+        {
+            _postService = postService;
+            _elasticSearchService = elasticSearchService;
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] PostDTO postDTO)
@@ -27,5 +33,12 @@ namespace mongotest.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetPosts() => Ok(await _postService.GetPostsAsync());
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string q)
+        {
+            var searchResponse = await _elasticSearchService.SearchPostsAsync(q);
+            return Ok(searchResponse.Documents);
+        }
     }
 }

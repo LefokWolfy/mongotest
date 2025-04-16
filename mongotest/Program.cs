@@ -5,11 +5,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using mongoAPI.Services;
 using mongotest.Services;
+using mongotest;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<CommentService>();
 builder.Services.AddSingleton<PostService>();
+builder.Services.AddSingleton<ElasticSearchService>();
 
 
 // Add services to the container
@@ -23,6 +25,15 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Seed default data
+using (var scope = app.Services.CreateScope())
+{
+    var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+    var postService = scope.ServiceProvider.GetRequiredService<PostService>();
+
+    await SeedData.InitializeAsync(userService, postService);
+}
 
 // Enable Swagger UI
 if (app.Environment.IsDevelopment())
