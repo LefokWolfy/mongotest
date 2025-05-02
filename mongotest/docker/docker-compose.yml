@@ -9,13 +9,13 @@ services:
     ports:
       - "27017:27017"
     volumes:
-    #  - ./keyfile:/keyfile
+      - ./keyfile:/keyfile
       - mongo1_data:/data/db
     # environment:
     #   - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-admin}
     #   - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-admin}
     # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
-    command: ["--replSet", "rs0"]
+    command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --keyFile /keyfile/mongo-keyfile"]
     networks:
       - backend
 
@@ -24,10 +24,10 @@ services:
     image: mongo:6
     container_name: mongo2
     volumes:
-    #  - ./keyfile:/keyfile
+      - ./keyfile:/keyfile
       - mongo2_data:/data/db
     # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
-    command: ["--replSet", "rs0"]
+    command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --keyFile /keyfile/mongo-keyfile"]
     networks:
       - backend
 
@@ -36,10 +36,10 @@ services:
     image: mongo:6
     container_name: mongo3
     volumes:
-    #  - ./keyfile:/keyfile
+      - ./keyfile:/keyfile
       - mongo3_data:/data/db
     # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
-    command: ["--replSet", "rs0"]
+    command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --keyFile /keyfile/mongo-keyfile"]
     networks:
       - backend
 
