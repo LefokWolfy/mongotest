@@ -21,3 +21,33 @@ mongosh --host mongo1 --eval 'rs.initiate({
     { _id: 2, host: "mongo3:27017" }
   ]
 })'
+
+echo "🔁 Waiting for primary election"
+sleep 10
+
+PRIMARY=""
+for HOST in mongo1 mongo2 mongo3; do
+  IS_PRIMARY=$(mongosh --quiet --host $HOST --eval "db.isMaster().ismaster")
+  if [ "$IS_PRIMARY" = "true" ]; then
+    PRIMARY=$HOST
+    echo "✅ Primary elected: $PRIMARY"
+    break
+  fi
+done
+
+if [ -z "$PRIMARY" ]; then
+  echo "❌ Could not determine primary."
+  exit 1
+fi
+
+echo "🛡️ Creating admin user on $PRIMARY..."
+
+mongosh --host $PRIMARY --eval '
+  db.getSiblingDB("admin").createUser({
+    user: "root",
+    pwd: "admin",
+    roles: [ { role: "root", db: "admin" } ]
+  })
+'
+
+echo "✅ Replica set initialized and admin user created."
