@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  # MongoDB PRIMARY
+  mongo1:
+    image: mongo:6
+    container_name: mongo1
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+    #  - ./keyfile:/keyfile
+      - mongo1_data:/data/db
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-admin}
+    #   - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-admin}
+    # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
+    command: ["--replSet", "rs0"]
+    networks:
+      - backend
+
+  # MongoDB SECONDARY 1
+  mongo2:
+    image: mongo:6
+    container_name: mongo2
+    volumes:
+    #  - ./keyfile:/keyfile
+      - mongo2_data:/data/db
+    # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
+    command: ["--replSet", "rs0"]
+    networks:
+      - backend
+
+  # MongoDB SECONDARY 2
+  mongo3:
+    image: mongo:6
+    container_name: mongo3
+    volumes:
+    #  - ./keyfile:/keyfile
+      - mongo3_data:/data/db
+    # command: ["sh", "-c", "sleep 10 && mongod --replSet rs0 --auth --keyFile /keyfile/mongo-keyfile"]
+    command: ["--replSet", "rs0"]
+    networks:
+      - backend
+
+  # Replica set initializer (runs once on startup)
+  mongors-init:
+    image: mongo:6
+    container_name: mongors-init
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - backend
+    restart: "no"
+    entrypoint: [ "sh", "-c", "sh /init/init-replica.sh" ]
+    volumes:
+      - ./init:/init
+    working_dir: /
+    
+
+  # Elasticsearch Node 1 (Master Eligible)
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - backend
+
+  # Elasticsearch Node 2
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata02:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+  # Elasticsearch Node 3
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata03:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+  # ASP.NET Core Application
+  dotnet-app:
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: dotnet-app
+    environment:
+      # Overrides your appsettings.json connection strings by using the colon notation.
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__MongoDB=mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      - Elasticsearch__Uri=http://es01:9200
+      - Elasticsearch__Username=elastic
+      - Elasticsearch__Password=changeme
+    ports:
+      - "5042:80"  # assuming your app listens on port 80 internally
+    depends_on:
+      - mongors-init
+      - es01
+    networks:
+      - backend
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:
+  esdata01:
+  esdata02:
+  esdata03:
+
+networks:
+  backend:
+    driver: bridge
